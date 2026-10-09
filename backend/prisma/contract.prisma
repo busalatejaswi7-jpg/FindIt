@@ -1,0 +1,59 @@
+// use prisma-8
+enum UserRole {
+  @@type("pg/text@1")
+  CUSTOMER = "CUSTOMER"
+  SHOP_OWNER = "SHOP_OWNER"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      UserRole @default(CUSTOMER)
+  createdAt DateTime @default(now())
+}
+
+model Shop {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  city      String
+  latitude  Float
+  longitude Float
+  ownerId   String
+  createdAt DateTime @default(now())
+  owner     User     @relation(fields: [ownerId], references: [id])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  category    String
+  image       String?
+}
+
+model Inventory {
+  id        String   @id @default(uuid())
+  shopId    String
+  productId String
+  quantity  Int      @default(0)
+  updatedAt DateTime @default(now())
+  shop      Shop     @relation(fields: [shopId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([shopId, productId])
+}
+
+model Reservation {
+  id          String   @id @default(uuid())
+  userId      String
+  inventoryId String
+  quantity    Int
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  inventory   Inventory @relation(fields: [inventoryId], references: [id])
+}
