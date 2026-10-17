@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { getUser, type LoggedInUser } from "../lib/auth";
 
 export default function Home() {
@@ -122,6 +123,64 @@ export default function Home() {
               </p>
             </article>
           </div>
+        </div>
+      </section>
+
+      <section className="border-t border-[var(--line)] bg-[var(--brand-soft)] py-12 sm:py-16">
+        <div className="page-wrap">
+          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="section-kicker">Explore FINDIT</p>
+              <h2 className="display-type mt-2 text-3xl sm:text-4xl">
+                Go straight to a workspace.
+              </h2>
+            </div>
+            <p className="max-w-md text-sm leading-6 text-[var(--muted)]">
+              Discovery, reservations, and shop tools are all part of the same
+              local marketplace.
+            </p>
+          </div>
+
+          <nav
+            aria-label="Explore FINDIT pages"
+            className="grid border-y border-[var(--line)] sm:grid-cols-2 lg:grid-cols-5"
+          >
+            {[
+              { href: "/search", label: "Search", detail: "Find local stock" },
+              {
+                href: "/reservations",
+                label: "Reservations",
+                detail: "View pickup holds",
+              },
+              {
+                href: "/owner",
+                label: "Shop workspace",
+                detail: "Manage locations",
+              },
+              {
+                href: "/products/create",
+                label: "Add product",
+                detail: "Update the catalog",
+              },
+              { href: "/login", label: "Sign in", detail: "Access your account" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex min-h-28 flex-col justify-between border-b border-[var(--line)] px-4 py-4 transition-colors hover:bg-white sm:border-r lg:border-b-0 lg:last:border-r-0"
+              >
+                <span className="font-semibold text-[var(--ink)] group-hover:text-[var(--brand)]">
+                  {item.label}
+                </span>
+                <span className="mt-3 flex items-center justify-between gap-3 text-xs text-[var(--muted)]">
+                  {item.detail}
+                  <span aria-hidden="true" className="text-[var(--coral)]">
+                    →
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </nav>
         </div>
       </section>
     </main>

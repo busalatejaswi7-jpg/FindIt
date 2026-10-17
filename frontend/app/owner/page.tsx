@@ -242,6 +242,11 @@ export default function ShopOwnerDashboard() {
     setStockError("");
     setStockMessage("");
 
+    if (!stockQuantity.trim()) {
+      setStockError("Enter a stock quantity.");
+      return;
+    }
+
     const quantity = Number(stockQuantity);
 
     if (!Number.isSafeInteger(quantity) || quantity < 0) {
@@ -292,48 +297,50 @@ export default function ShopOwnerDashboard() {
   );
 
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10 text-gray-900 sm:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+    <main className="page-section">
+      <div className="page-wrap">
+        <header className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--line)] pb-6">
           <div>
-            <p className="text-sm font-medium text-blue-600">
-              FINDIT FOR BUSINESS
-            </p>
-
-            <h1 className="mt-2 text-3xl font-bold">Shop Owner Dashboard</h1>
-
-            <p className="mt-2 text-gray-500">
-              Manage your shops and monitor your stock.
+            <p className="section-kicker">Shop workspace</p>
+            <h1 className="display-type mt-3 text-4xl leading-tight sm:text-5xl">
+              Inventory overview
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-[var(--muted)]">
+              Manage shop locations, product listings, and current stock.
             </p>
           </div>
-
           <button
             type="button"
             onClick={() => router.push("/")}
-            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium hover:bg-gray-100"
+            className="button-secondary"
           >
-            Back to FindIt
+            Back to discovery
           </button>
-        </div>
+        </header>
 
         {loading && (
-          <p className="mt-10 text-gray-500">
-            Loading your shops and inventory...
-          </p>
+          <div
+            className="grid gap-4 md:grid-cols-3"
+            aria-live="polite"
+            aria-busy="true"
+          >
+            {[0, 1, 2].map((item) => (
+              <div
+                key={item}
+                className="surface-panel h-28 animate-pulse bg-white"
+              />
+            ))}
+          </div>
         )}
 
         {!loading && error && (
-          <div className="mt-8 rounded-xl border border-red-200 bg-red-50 p-5">
-            <p className="font-semibold text-red-700">
-              Could not load dashboard
-            </p>
-
-            <p className="mt-2 text-sm text-red-600">{error}</p>
-
+          <div className="notice-error" role="alert">
+            <p className="font-semibold">Workspace could not be loaded</p>
+            <p className="mt-1">{error}</p>
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="mt-4 rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100"
+              className="button-secondary mt-4"
             >
               Try again
             </button>
@@ -341,424 +348,500 @@ export default function ShopOwnerDashboard() {
         )}
 
         {!loading && !error && (
-          <>
-            <section className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold">Create Shop</h2>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Register your physical shop on FindIt.
-              </p>
+          <div className="space-y-8">
+            <section
+              className="surface-panel p-5 sm:p-7"
+              aria-labelledby="create-shop-heading"
+            >
+              <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="section-kicker">Location</p>
+                  <h2
+                    id="create-shop-heading"
+                    className="mt-2 text-xl font-semibold"
+                  >
+                    Register a shop
+                  </h2>
+                </div>
+                <p className="text-sm text-[var(--muted)]">
+                  Coordinates help identify the location.
+                </p>
+              </div>
 
               <form
                 onSubmit={handleCreateShop}
-                className="mt-5 grid gap-4 sm:grid-cols-2"
+                className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
               >
-                <input
-                  required
-                  placeholder="Shop name"
-                  value={shopForm.name}
-                  onChange={(e) =>
-                    setShopForm({ ...shopForm, name: e.target.value })
-                  }
-                  className="rounded-lg border border-gray-300 px-4 py-3"
-                />
-
-                <input
-                  required
-                  placeholder="Address"
-                  value={shopForm.address}
-                  onChange={(e) =>
-                    setShopForm({ ...shopForm, address: e.target.value })
-                  }
-                  className="rounded-lg border border-gray-300 px-4 py-3"
-                />
-
-                <input
-                  required
-                  placeholder="City"
-                  value={shopForm.city}
-                  onChange={(e) =>
-                    setShopForm({ ...shopForm, city: e.target.value })
-                  }
-                  className="rounded-lg border border-gray-300 px-4 py-3"
-                />
-
-                <input
-                  required
-                  type="number"
-                  step="any"
-                  min="-90"
-                  max="90"
-                  placeholder="Latitude"
-                  value={shopForm.latitude}
-                  onChange={(e) =>
-                    setShopForm({ ...shopForm, latitude: e.target.value })
-                  }
-                  className="rounded-lg border border-gray-300 px-4 py-3"
-                />
-
-                <input
-                  required
-                  type="number"
-                  step="any"
-                  min="-180"
-                  max="180"
-                  placeholder="Longitude"
-                  value={shopForm.longitude}
-                  onChange={(e) =>
-                    setShopForm({ ...shopForm, longitude: e.target.value })
-                  }
-                  className="rounded-lg border border-gray-300 px-4 py-3"
-                />
-
-                <div className="sm:col-span-2">
+                <label className="block">
+                  <span className="field-label">Shop name</span>
+                  <input
+                    required
+                    value={shopForm.name}
+                    onChange={(event) =>
+                      setShopForm({ ...shopForm, name: event.target.value })
+                    }
+                    className="field-control"
+                    autoComplete="organization"
+                  />
+                </label>
+                <label className="block sm:col-span-2 lg:col-span-1">
+                  <span className="field-label">Address</span>
+                  <input
+                    required
+                    value={shopForm.address}
+                    onChange={(event) =>
+                      setShopForm({ ...shopForm, address: event.target.value })
+                    }
+                    className="field-control"
+                    autoComplete="street-address"
+                  />
+                </label>
+                <label className="block">
+                  <span className="field-label">City</span>
+                  <input
+                    required
+                    value={shopForm.city}
+                    onChange={(event) =>
+                      setShopForm({ ...shopForm, city: event.target.value })
+                    }
+                    className="field-control"
+                    autoComplete="address-level2"
+                  />
+                </label>
+                <label className="block">
+                  <span className="field-label">Latitude</span>
+                  <input
+                    required
+                    type="number"
+                    step="any"
+                    min="-90"
+                    max="90"
+                    value={shopForm.latitude}
+                    onChange={(event) =>
+                      setShopForm({ ...shopForm, latitude: event.target.value })
+                    }
+                    className="field-control"
+                  />
+                </label>
+                <label className="block">
+                  <span className="field-label">Longitude</span>
+                  <input
+                    required
+                    type="number"
+                    step="any"
+                    min="-180"
+                    max="180"
+                    value={shopForm.longitude}
+                    onChange={(event) =>
+                      setShopForm({
+                        ...shopForm,
+                        longitude: event.target.value,
+                      })
+                    }
+                    className="field-control"
+                  />
+                </label>
+                <div className="flex flex-wrap items-center gap-3 sm:col-span-2 lg:col-span-3">
                   {shopError && (
-                    <p role="alert" className="mb-3 text-sm text-red-600">
+                    <p role="alert" className="notice-error w-full">
                       {shopError}
                     </p>
                   )}
-
                   {shopMessage && (
-                    <p role="status" className="mb-3 text-sm text-green-700">
+                    <p role="status" className="notice-success w-full">
                       {shopMessage}
                     </p>
                   )}
-
                   <button
                     type="submit"
                     disabled={creatingShop}
-                    className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                    className="button-primary"
                   >
-                    {creatingShop ? "Creating shop..." : "Create Shop"}
+                    {creatingShop ? "Creating shop..." : "Create shop"}
                   </button>
                 </div>
               </form>
             </section>
 
-            <section className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-bold">Add Product & Stock</h2>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Add a product to one of your shops and set its available
-                quantity.
-              </p>
+            <section
+              className="surface-panel p-5 sm:p-7"
+              aria-labelledby="add-product-heading"
+            >
+              <div className="mb-6">
+                <p className="section-kicker">Catalog and stock</p>
+                <h2
+                  id="add-product-heading"
+                  className="mt-2 text-xl font-semibold"
+                >
+                  Add product to a shop
+                </h2>
+              </div>
 
               {shops.length === 0 ? (
-                <p className="mt-4 text-sm text-amber-700">
+                <p className="notice-info">
                   Create a shop before adding products.
                 </p>
               ) : (
                 <form
                   onSubmit={handleCreateProduct}
-                  className="mt-5 grid gap-4 sm:grid-cols-2"
+                  className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 >
-                  <select
-                    required
-                    value={productForm.shopId}
-                    onChange={(e) =>
-                      setProductForm({
-                        ...productForm,
-                        shopId: e.target.value,
-                      })
-                    }
-                    className="rounded-lg border border-gray-300 bg-white px-4 py-3"
-                  >
-                    <option value="">Select your shop</option>
-                    {shops.map((shop) => (
-                      <option key={shop.id} value={shop.id}>
-                        {shop.name} — {shop.city}
-                      </option>
-                    ))}
-                  </select>
-
-                  <input
-                    required
-                    placeholder="Product name"
-                    value={productForm.name}
-                    onChange={(e) =>
-                      setProductForm({ ...productForm, name: e.target.value })
-                    }
-                    className="rounded-lg border border-gray-300 px-4 py-3"
-                  />
-
-                  <input
-                    required
-                    placeholder="Category"
-                    value={productForm.category}
-                    onChange={(e) =>
-                      setProductForm({
-                        ...productForm,
-                        category: e.target.value,
-                      })
-                    }
-                    className="rounded-lg border border-gray-300 px-4 py-3"
-                  />
-
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    step="1"
-                    placeholder="Available quantity"
-                    value={productForm.quantity}
-                    onChange={(e) =>
-                      setProductForm({
-                        ...productForm,
-                        quantity: e.target.value,
-                      })
-                    }
-                    className="rounded-lg border border-gray-300 px-4 py-3"
-                  />
-
-                  <input
-                    placeholder="Description (optional)"
-                    value={productForm.description}
-                    onChange={(e) =>
-                      setProductForm({
-                        ...productForm,
-                        description: e.target.value,
-                      })
-                    }
-                    className="rounded-lg border border-gray-300 px-4 py-3"
-                  />
-
-                  <input
-                    type="url"
-                    placeholder="Image URL (optional)"
-                    value={productForm.image}
-                    onChange={(e) =>
-                      setProductForm({
-                        ...productForm,
-                        image: e.target.value,
-                      })
-                    }
-                    className="rounded-lg border border-gray-300 px-4 py-3"
-                  />
-
-                  <div className="sm:col-span-2">
+                  <label className="block">
+                    <span className="field-label">Shop</span>
+                    <select
+                      required
+                      value={productForm.shopId}
+                      onChange={(event) =>
+                        setProductForm({
+                          ...productForm,
+                          shopId: event.target.value,
+                        })
+                      }
+                      className="field-control"
+                    >
+                      <option value="">Select a shop</option>
+                      {shops.map((shop) => (
+                        <option key={shop.id} value={shop.id}>
+                          {shop.name} — {shop.city}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="field-label">Product name</span>
+                    <input
+                      required
+                      value={productForm.name}
+                      onChange={(event) =>
+                        setProductForm({
+                          ...productForm,
+                          name: event.target.value,
+                        })
+                      }
+                      className="field-control"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="field-label">Category</span>
+                    <input
+                      required
+                      value={productForm.category}
+                      onChange={(event) =>
+                        setProductForm({
+                          ...productForm,
+                          category: event.target.value,
+                        })
+                      }
+                      className="field-control"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="field-label">Available quantity</span>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      step="1"
+                      value={productForm.quantity}
+                      onChange={(event) =>
+                        setProductForm({
+                          ...productForm,
+                          quantity: event.target.value,
+                        })
+                      }
+                      className="field-control"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="field-label">
+                      Description{" "}
+                      <span className="font-normal text-[var(--muted)]">
+                        (optional)
+                      </span>
+                    </span>
+                    <input
+                      value={productForm.description}
+                      onChange={(event) =>
+                        setProductForm({
+                          ...productForm,
+                          description: event.target.value,
+                        })
+                      }
+                      className="field-control"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="field-label">
+                      Image URL{" "}
+                      <span className="font-normal text-[var(--muted)]">
+                        (optional)
+                      </span>
+                    </span>
+                    <input
+                      type="url"
+                      value={productForm.image}
+                      onChange={(event) =>
+                        setProductForm({
+                          ...productForm,
+                          image: event.target.value,
+                        })
+                      }
+                      className="field-control"
+                    />
+                  </label>
+                  <div className="flex flex-wrap items-center gap-3 sm:col-span-2 lg:col-span-3">
                     {productError && (
-                      <p role="alert" className="mb-3 text-sm text-red-600">
+                      <p role="alert" className="notice-error w-full">
                         {productError}
                       </p>
                     )}
-
                     {productMessage && (
-                      <p role="status" className="mb-3 text-sm text-green-700">
+                      <p role="status" className="notice-success w-full">
                         {productMessage}
                       </p>
                     )}
-
                     <button
                       type="submit"
                       disabled={creatingProduct}
-                      className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                      className="button-primary"
                     >
-                      {creatingProduct ? "Adding product..." : "Add Product"}
+                      {creatingProduct
+                        ? "Adding product..."
+                        : "Add product and stock"}
                     </button>
                   </div>
                 </form>
               )}
             </section>
-            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
-                <p className="text-sm font-medium text-gray-500">My Shops</p>
-                <p className="mt-3 text-3xl font-bold tracking-tight text-gray-900">
-                  {shops.length}
-                </p>
-                <p className="mt-1 text-sm text-gray-500">
-                  Registered locations
-                </p>
-              </div>
 
-              <div className="rounded-xl border border-gray-200 bg-white p-6">
-                <p className="text-sm text-gray-500">Product Listings</p>
-                <p className="mt-2 text-3xl font-bold">{totalProducts}</p>
+            <section
+              aria-label="Inventory summary"
+              className="grid gap-3 sm:grid-cols-3"
+            >
+              <div className="surface-panel border-t-2 border-t-[var(--coral)] p-5">
+                <p className="text-sm font-medium text-[var(--muted)]">
+                  My shops
+                </p>
+                <p className="display-type mt-2 text-4xl">{shops.length}</p>
               </div>
-
-              <div className="rounded-xl border border-gray-200 bg-white p-6">
-                <p className="text-sm text-gray-500">Total Units in Stock</p>
-                <p className="mt-2 text-3xl font-bold">{totalUnits}</p>
+              <div className="surface-panel p-5">
+                <p className="text-sm font-medium text-[var(--muted)]">
+                  Product listings
+                </p>
+                <p className="display-type mt-2 text-4xl">{totalProducts}</p>
               </div>
-            </div>
+              <div className="surface-panel p-5">
+                <p className="text-sm font-medium text-[var(--muted)]">
+                  Units in stock
+                </p>
+                <p className="display-type mt-2 text-4xl">{totalUnits}</p>
+              </div>
+            </section>
 
             {stockError && (
-              <p role="alert" className="mt-5 text-sm text-red-600">
+              <p role="alert" className="notice-error">
                 {stockError}
               </p>
             )}
-
             {stockMessage && (
-              <p role="status" className="mt-5 text-sm text-green-700">
+              <p role="status" className="notice-success">
                 {stockMessage}
               </p>
             )}
 
             {shops.length === 0 ? (
-              <div className="mt-8 rounded-xl border border-gray-200 bg-white p-10 text-center">
-                <h2 className="text-xl font-semibold">No shops found</h2>
-
-                <p className="mt-2 text-gray-500">
-                  No shops are currently linked to this shop-owner account.
+              <section className="surface-panel px-6 py-12 text-center sm:px-10">
+                <p className="section-kicker">No locations yet</p>
+                <h2 className="display-type mt-3 text-3xl">
+                  Your first shop starts here.
+                </h2>
+                <p className="mt-2 text-sm text-[var(--muted)]">
+                  Add a shop above to begin managing its inventory.
                 </p>
-              </div>
+              </section>
             ) : (
-              <div className="mt-10 space-y-8">
+              <section aria-labelledby="shops-heading" className="space-y-4">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p className="section-kicker">Locations</p>
+                    <h2
+                      id="shops-heading"
+                      className="mt-2 text-xl font-semibold"
+                    >
+                      Your shops
+                    </h2>
+                  </div>
+                  <p className="text-sm text-[var(--muted)]">
+                    {shops.length}{" "}
+                    {shops.length === 1 ? "location" : "locations"}
+                  </p>
+                </div>
+
                 {shops.map((shop) => (
-                  <section
+                  <article
                     key={shop.id}
-                    className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                    className="surface-panel overflow-hidden"
                   >
-                    <div className="border-b border-gray-100 p-6">
-                      <h2 className="text-xl font-bold">{shop.name}</h2>
-
-                      <p className="mt-2 text-sm text-gray-500">
-                        {shop.address}, {shop.city}
-                      </p>
-
-                      <p className="mt-1 text-xs text-gray-400">
-                        {shop.inventory.length} product listings
-                      </p>
-                    </div>
+                    <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--line)] p-5 sm:p-6">
+                      <div className="min-w-0">
+                        <h3 className="display-type break-words text-2xl">
+                          {shop.name}
+                        </h3>
+                        <p className="mt-2 break-words text-sm text-[var(--muted)]">
+                          {shop.address}, {shop.city}
+                        </p>
+                      </div>
+                      <span className="status-badge status-available">
+                        {shop.inventory.length}{" "}
+                        {shop.inventory.length === 1 ? "listing" : "listings"}
+                      </span>
+                    </header>
 
                     {shop.inventory.length === 0 ? (
-                      <p className="p-6 text-sm text-gray-500">
-                        This shop has no inventory listings yet.
+                      <p className="px-5 py-8 text-sm text-[var(--muted)] sm:px-6">
+                        No inventory listings at this shop yet.
                       </p>
                     ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full min-w-[600px] text-left text-sm">
-                          <thead className="bg-gray-50 text-gray-500">
+                      <div
+                        className="overflow-x-auto"
+                        role="region"
+                        aria-label={`Inventory for ${shop.name}`}
+                        tabIndex={0}
+                      >
+                        <table className="inventory-table">
+                          <thead>
                             <tr>
-                              <th className="px-6 py-4 font-medium">Product</th>
-                              <th className="px-6 py-4 font-medium">
-                                Category
-                              </th>
-                              <th className="px-6 py-4 font-medium">
-                                Available
-                              </th>
-                              <th className="px-6 py-4 font-medium">
-                                Stock status
-                              </th>
-                              <th className="px-6 py-4 font-medium">Actions</th>
+                              <th scope="col">Product</th>
+                              <th scope="col">Category</th>
+                              <th scope="col">Available</th>
+                              <th scope="col">Stock status</th>
+                              <th scope="col">Actions</th>
                             </tr>
                           </thead>
-
                           <tbody>
-                            {shop.inventory.map((item) => (
-                              <tr
-                                key={item.inventoryId}
-                                className="border-t border-gray-100"
-                              >
-                                <td className="px-6 py-4">
-                                  <p className="font-semibold">
-                                    {item.productName}
-                                  </p>
+                            {shop.inventory.map((item) => {
+                              const unavailable = item.quantity <= 0;
+                              const lowStock =
+                                item.quantity > 0 && item.quantity <= 5;
 
-                                  {item.description && (
-                                    <p className="mt-1 text-xs text-gray-500">
-                                      {item.description}
+                              return (
+                                <tr key={item.inventoryId}>
+                                  <td>
+                                    <p className="break-words font-semibold text-[var(--ink)]">
+                                      {item.productName}
                                     </p>
-                                  )}
-                                </td>
-
-                                <td className="px-6 py-4 text-gray-600">
-                                  {item.category}
-                                </td>
-
-                                <td className="px-6 py-4 font-semibold">
-                                  {item.quantity}
-                                </td>
-
-                                <td className="px-6 py-4">
-                                  <span
-                                    className={`rounded-full px-3 py-1 text-xs font-medium ${
-                                      item.quantity <= 0
-                                        ? "bg-red-100 text-red-700"
-                                        : item.quantity <= 5
-                                          ? "bg-yellow-100 text-yellow-700"
-                                          : "bg-green-100 text-green-700"
-                                    }`}
-                                  >
-                                    {item.quantity <= 0
-                                      ? "Out of stock"
-                                      : item.quantity <= 5
-                                        ? "Low stock"
-                                        : "In stock"}
-                                  </span>
-                                </td>
-
-                                <td className="px-6 py-4">
-                                  {editingInventoryId === item.inventoryId ? (
-                                    <form
-                                      onSubmit={(event) =>
-                                        handleUpdateStock(event, item.inventoryId)
-                                      }
-                                      className="flex items-center gap-2"
+                                    {item.description && (
+                                      <p className="mt-1 max-w-sm text-xs leading-5 text-[var(--muted)]">
+                                        {item.description}
+                                      </p>
+                                    )}
+                                  </td>
+                                  <td className="text-[var(--muted)]">
+                                    {item.category}
+                                  </td>
+                                  <td className="font-semibold tabular-nums">
+                                    {item.quantity}
+                                  </td>
+                                  <td>
+                                    <span
+                                      className={`status-badge ${
+                                        unavailable
+                                          ? "status-empty"
+                                          : lowStock
+                                            ? "status-low"
+                                            : "status-available"
+                                      }`}
                                     >
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        step="1"
-                                        required
-                                        aria-label={`New stock quantity for ${item.productName}`}
-                                        value={stockQuantity}
-                                        onChange={(event) =>
-                                          setStockQuantity(event.target.value)
+                                      {unavailable
+                                        ? "Out of stock"
+                                        : lowStock
+                                          ? "Low stock"
+                                          : "Available"}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    {editingInventoryId === item.inventoryId ? (
+                                      <form
+                                        onSubmit={(event) =>
+                                          handleUpdateStock(
+                                            event,
+                                            item.inventoryId,
+                                          )
                                         }
-                                        className="w-24 rounded-md border border-gray-300 px-2 py-1"
-                                      />
-                                      <button
-                                        type="submit"
-                                        disabled={
-                                          updatingInventoryId === item.inventoryId
-                                        }
-                                        className="rounded-md bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+                                        className="flex flex-wrap items-center gap-2"
                                       >
-                                        {updatingInventoryId === item.inventoryId
-                                          ? "Saving..."
-                                          : "Save"}
-                                      </button>
+                                        <input
+                                          type="number"
+                                          min="0"
+                                          step="1"
+                                          required
+                                          aria-label={`New stock quantity for ${item.productName}`}
+                                          value={stockQuantity}
+                                          onChange={(event) =>
+                                            setStockQuantity(event.target.value)
+                                          }
+                                          className="field-control w-24"
+                                        />
+                                        <button
+                                          type="submit"
+                                          disabled={
+                                            updatingInventoryId ===
+                                            item.inventoryId
+                                          }
+                                          className="button-primary min-h-9 px-3 py-2 text-xs"
+                                        >
+                                          {updatingInventoryId ===
+                                          item.inventoryId
+                                            ? "Saving..."
+                                            : "Save"}
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={
+                                            updatingInventoryId ===
+                                            item.inventoryId
+                                          }
+                                          onClick={() => {
+                                            setEditingInventoryId(null);
+                                            setStockQuantity("");
+                                            setStockError("");
+                                          }}
+                                          className="button-secondary min-h-9 px-3 py-2 text-xs"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </form>
+                                    ) : (
                                       <button
                                         type="button"
-                                        disabled={
-                                          updatingInventoryId === item.inventoryId
-                                        }
                                         onClick={() => {
-                                          setEditingInventoryId(null);
-                                          setStockQuantity("");
+                                          setEditingInventoryId(
+                                            item.inventoryId,
+                                          );
+                                          setStockQuantity(
+                                            String(item.quantity),
+                                          );
                                           setStockError("");
+                                          setStockMessage("");
                                         }}
-                                        className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50 disabled:opacity-60"
+                                        className="button-secondary min-h-9 px-3 py-2 text-xs"
                                       >
-                                        Cancel
+                                        Edit stock
                                       </button>
-                                    </form>
-                                  ) : (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setEditingInventoryId(item.inventoryId);
-                                        setStockQuantity(String(item.quantity));
-                                        setStockError("");
-                                        setStockMessage("");
-                                      }}
-                                      className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium hover:bg-gray-50"
-                                    >
-                                      Edit Stock
-                                    </button>
-                                  )}
-                                </td>
-                              </tr>
-                            ))}
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>
                     )}
-                  </section>
+                  </article>
                 ))}
-              </div>
+              </section>
             )}
-          </>
+          </div>
         )}
       </div>
     </main>

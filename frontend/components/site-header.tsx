@@ -20,35 +20,13 @@ export default function SiteHeader() {
     router.push("/login");
   };
 
-  const navigation = (
-    <>
-      <Link
-        href="/"
-        aria-current={pathname === "/" ? "page" : undefined}
-        className="site-nav-link"
-      >
-        Discover
-      </Link>
-      {user && (
-        <Link
-          href="/reservations"
-          aria-current={pathname === "/reservations" ? "page" : undefined}
-          className="site-nav-link"
-        >
-          Reservations
-        </Link>
-      )}
-      {user?.role === "SHOP_OWNER" && (
-        <Link
-          href="/owner"
-          aria-current={pathname === "/owner" ? "page" : undefined}
-          className="site-nav-link"
-        >
-          Shop workspace
-        </Link>
-      )}
-    </>
-  );
+  const navigation = [
+    { href: "/", label: "Discover" },
+    { href: "/search", label: "Search" },
+    { href: "/reservations", label: "Reservations" },
+    { href: "/owner", label: "Shop workspace" },
+    { href: "/products/create", label: "Add product" },
+  ];
 
   return (
     <header className="site-header">
@@ -61,7 +39,16 @@ export default function SiteHeader() {
         </Link>
 
         <nav className="site-nav" aria-label="Main navigation">
-          {navigation}
+          {navigation.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={pathname === item.href ? "page" : undefined}
+              className="site-nav-link"
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         <div className="site-header-actions">
@@ -80,7 +67,16 @@ export default function SiteHeader() {
         <details className="mobile-nav">
           <summary aria-label="Open navigation menu">Menu</summary>
           <nav className="mobile-nav-panel" aria-label="Mobile navigation">
-            {navigation}
+            {navigation.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={pathname === item.href ? "page" : undefined}
+                className="site-nav-link"
+              >
+                {item.label}
+              </Link>
+            ))}
             {user ? (
               <button type="button" className="site-nav-link" onClick={signOut}>
                 Sign out
