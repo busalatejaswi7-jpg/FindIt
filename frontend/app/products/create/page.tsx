@@ -42,13 +42,9 @@ export default function CreateProductPage() {
   return (
     <main className="min-h-screen bg-gray-50 px-8 py-10">
       <div className="mx-auto max-w-xl">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Create Product
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-900">Create Product</h1>
 
-        <p className="mt-2 text-gray-500">
-          Add a product to FindIt.
-        </p>
+        <p className="mt-2 text-gray-500">Add a product to FindIt.</p>
 
         <form
           onSubmit={handleSubmit}
@@ -105,9 +101,7 @@ export default function CreateProductPage() {
           </button>
 
           {message && (
-            <p className="text-center text-sm text-gray-600">
-              {message}
-            </p>
+            <p className="text-center text-sm text-gray-600">{message}</p>
           )}
         </form>
       </div>

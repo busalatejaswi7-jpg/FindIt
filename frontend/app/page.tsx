@@ -1,190 +1,126 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { startTransition, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  getUser,
-  logout,
-  type LoggedInUser,
-} from "../lib/auth";
+import { getUser, type LoggedInUser } from "../lib/auth";
+
 export default function Home() {
-  const router=useRouter();
-  const [search,setSearch]=useState("");
-const [user,setUser]=useState<LoggedInUser | null>(null);
-useEffect(() => {
-  setUser(getUser());
-}, []);
+  const router = useRouter();
+  const [search, setSearch] = useState("");
+  const [user, setUser] = useState<LoggedInUser | null>(null);
+
+  useEffect(() => {
+    startTransition(() => setUser(getUser()));
+
+    const query = new URLSearchParams(window.location.search).get("q")?.trim();
+    if (query) {
+      router.replace(`/search?q=${encodeURIComponent(query)}`);
+    }
+  }, [router]);
+
+  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const query = search.trim();
+    if (query) {
+      router.push(`/search?q=${encodeURIComponent(query)}`);
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-white text-gray-900">
-      {/* Navbar */}
-      <nav className="flex items-center justify-between border-b border-gray-200 px-8 py-5">
-        <h1 className="text-2xl font-bold text-blue-600">
-          FindIt
-        </h1>
+    <main>
+      <section className="home-hero">
+        <div className="home-hero-inner">
+          <p className="home-kicker">
+            FINDIT <span>/</span> LOCAL DISCOVERY
+          </p>
+          <h1 className="display-type mt-5 max-w-4xl text-5xl leading-[1.04] sm:text-6xl lg:text-7xl">
+            Find the right thing.
+            <br />
+            <span className="home-hero-accent">Close to home.</span>
+          </h1>
+          <p className="mt-6 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">
+            Search product names or categories across local shop inventory. Check
+            what is available, then reserve it for pickup.
+          </p>
 
-        <div className="flex items-center gap-8">
-          <a
-            href="#how-it-works"
-            className="text-sm font-medium text-gray-600 hover:text-blue-600"
-          >
-            How it works
-          </a>
+          <form className="hero-search mt-9" onSubmit={handleSearch}>
+            <label className="sr-only" htmlFor="product-search">
+              Search products and categories
+            </label>
+            <input
+              id="product-search"
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="What are you looking for?"
+              autoComplete="off"
+            />
+            <button type="submit" className="button-primary">
+              Search stock
+            </button>
+          </form>
 
-          <a
-            href="#shops"
-            className="text-sm font-medium text-gray-600 hover:text-blue-600"
-          >
-            Shops
-          </a>
-
-        {user ? (
-  <>
-    <span className="text-sm font-medium text-gray-700">
-      Hi, {user.name}
-    </span>
-    <button
-      onClick={() => router.push("/reservations")}
-      className="rounded-lg border bg-black text-white border-gray-300 px-5 py-2 text-sm font-medium hover:bg-gray-50"
-    >
-      My Reservations
-    </button>
-
-
-    <button
-      onClick={() => {
-        logout();
-        setUser(null);
-      }}
-      className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium hover:bg-gray-50"
-    >
-      Logout
-    </button>
-  </>
-) : (
-  <>
-    <button
-      onClick={() => router.push("/login")}
-      className="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium hover:bg-gray-50"
-    >
-      Login
-    </button>
-
-    <button
-      onClick={() => router.push("/login")}
-      className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700"
-    >
-      Get Started
-    </button>
-  </>
-)}
+          <div className="home-sequence" aria-label="Findit process">
+            <span>Search</span>
+            <span aria-hidden="true">/</span>
+            <span>Check availability</span>
+            <span aria-hidden="true">/</span>
+            <span>Reserve for pickup</span>
+          </div>
+          {user?.role === "SHOP_OWNER" && (
+            <p className="mt-7 text-sm text-white/80">
+              Managing a shop?{" "}
+              <button
+                type="button"
+                onClick={() => router.push("/owner")}
+                className="font-semibold text-white underline decoration-white/50 underline-offset-4 hover:decoration-white"
+              >
+                Open your shop workspace
+              </button>
+            </p>
+          )}
         </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="flex min-h-[600px] flex-col items-center justify-center px-6 text-center">
-        <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-blue-600">
-          Find what you need, nearby, right now.
-        </p>
-
-        <h2 className="max-w-4xl text-5xl font-bold leading-tight tracking-tight">
-          Find products in nearby shops
-          <br />
-          <span className="text-blue-600">before you go there.</span>
-        </h2>
-
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-gray-500">
-          Search for a product, discover nearby stores that have it in stock,
-          and reserve it for pickup.
-        </p>
-
-        {/* Search Box */}
-        <div className="mt-10 flex w-full max-w-2xl items-center rounded-xl border border-gray-300 bg-white p-2 shadow-lg">
-          <input
-            type="text"
-            placeholder="What are you looking for?"
-            className="flex-1 px-4 py-3 text-base outline-none placeholder:text-gray-400"
-            value={search}
-            onChange={(e)=>setSearch(e.target.value)}
-          />
-
-          <button 
-           onClick={() => {
-            if(!search.trim()){
-              return;
-            }
-                router.push(`/search?q=${encodeURIComponent(search)}`);
-          }}
-        
-          className="rounded-lg bg-blue-600 px-7 py-3 font-medium text-white hover:bg-blue-700">
-            Search
-          </button>
-        </div>
-
-        <p className="mt-4 text-sm text-gray-400">
-          Try: laptop charger, medicine, notebook, batteries...
-        </p>
       </section>
 
-      {/* How It Works */}
-      <section
-        id="how-it-works"
-        className="bg-gray-50 px-8 py-20"
-      >
-        <div className="mx-auto max-w-6xl">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold">
-              How FindIt works
-            </h2>
-
-            <p className="mt-3 text-gray-500">
-              Find what you need in three simple steps.
+      <section id="how-it-works" className="page-section">
+        <div className="page-wrap">
+          <div className="mb-8 grid gap-5 md:grid-cols-[0.8fr_1.2fr] md:items-end">
+            <div>
+              <p className="section-kicker">A simple local loop</p>
+              <h2 className="display-type mt-3 text-4xl leading-tight sm:text-5xl">
+                From search
+                <br />
+                to pickup.
+              </h2>
+            </div>
+            <p className="max-w-xl text-base leading-7 text-[var(--muted)]">
+              Find products stocked by physical shops, compare availability,
+              and keep your reservation details in one place.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {/* Step 1 */}
-            <div className="rounded-xl bg-white p-8 shadow-sm">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-xl font-bold text-blue-600">
-                1
-              </div>
-
-              <h3 className="text-xl font-semibold">
-                Search
-              </h3>
-
-              <p className="mt-3 leading-7 text-gray-500">
-                Search for the exact product you need.
+          <div className="process-grid">
+            <article className="process-step">
+              <p className="section-kicker">01</p>
+              <h3 className="mt-5 text-lg font-semibold">Search what you need</h3>
+              <p className="mt-2 max-w-xs text-sm leading-6 text-[var(--muted)]">
+                Look up a product by name or category.
               </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="rounded-xl bg-white p-8 shadow-sm">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-xl font-bold text-blue-600">
-                2
-              </div>
-
-              <h3 className="text-xl font-semibold">
-                Find nearby
-              </h3>
-
-              <p className="mt-3 leading-7 text-gray-500">
-                See nearby shops and check their current availability.
+            </article>
+            <article className="process-step">
+              <p className="section-kicker">02</p>
+              <h3 className="mt-5 text-lg font-semibold">Check shop stock</h3>
+              <p className="mt-2 max-w-xs text-sm leading-6 text-[var(--muted)]">
+                Review available quantity and the shop location.
               </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="rounded-xl bg-white p-8 shadow-sm">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-xl font-bold text-blue-600">
-                3
-              </div>
-
-              <h3 className="text-xl font-semibold">
-                Reserve & Pick Up
-              </h3>
-
-              <p className="mt-3 leading-7 text-gray-500">
-                Reserve the product and pick it up from the shop.
+            </article>
+            <article className="process-step">
+              <p className="section-kicker">03</p>
+              <h3 className="mt-5 text-lg font-semibold">Reserve for pickup</h3>
+              <p className="mt-2 max-w-xs text-sm leading-6 text-[var(--muted)]">
+                Sign in to reserve and revisit it in your reservations.
               </p>
-            </div>
+            </article>
           </div>
         </div>
       </section>

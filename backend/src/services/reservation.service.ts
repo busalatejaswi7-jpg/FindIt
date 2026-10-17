@@ -11,8 +11,6 @@ export const createReservation = async (data: {
   return await createReservationRepository(data);
 };
 
-export const getReservationsByUser = async (
-  userId: string
-) => {
+export const getReservationsByUser = async (userId: string) => {
   return await getReservationsByUserRepository(userId);
 };

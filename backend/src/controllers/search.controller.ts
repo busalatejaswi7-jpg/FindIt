@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import { searchProducts } from "../services/search.service.js";
 
-export const searchProductsController = async (
-  req: Request,
-  res: Response
-) => {
+export const searchProductsController = async (req: Request, res: Response) => {
   const query = req.query.q;
 
   if (typeof query !== "string" || !query.trim()) {

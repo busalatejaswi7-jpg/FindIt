@@ -1,27 +1,30 @@
 import { Request, Response } from "express";
-import { createReservation, getReservationsByUser, } from "../services/reservation.service.js";
+import {
+  createReservation,
+  getReservationsByUser,
+} from "../services/reservation.service.js";
 import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 export const createReservationController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
-  const {
-    inventoryId,
-    quantity,
-  } = req.body;
-const userId = (req as AuthenticatedRequest).user.userId;
-  if (!inventoryId || quantity === undefined) {
-    return res.status(400).json({
-      message: "userId, inventoryId and quantity are required",
-    });
-  }
+  const { inventoryId, quantity } = req.body;
+  const userId = (req as AuthenticatedRequest).user.userId;
+ if (
+  typeof inventoryId !== "string" ||
+  !inventoryId.trim() ||
+  quantity === undefined ||
+  quantity === null ||
+  quantity === ""
+) {
+  return res.status(400).json({
+    message: "inventoryId and quantity are required",
+  });
+}
 
   const requestedQuantity = Number(quantity);
 
-  if (
-    !Number.isInteger(requestedQuantity) ||
-    requestedQuantity <= 0
-  ) {
+  if (!Number.isInteger(requestedQuantity) || requestedQuantity <= 0) {
     return res.status(400).json({
       message: "Quantity must be a positive integer",
     });
@@ -47,8 +50,7 @@ const userId = (req as AuthenticatedRequest).user.userId;
 
       if (
         error.message === "Not enough inventory available" ||
-        error.message ===
-          "Inventory was already changed. Please try again."
+        error.message === "Inventory was already changed. Please try again."
       ) {
         return res.status(409).json({
           message: error.message,
@@ -63,7 +65,7 @@ const userId = (req as AuthenticatedRequest).user.userId;
 };
 export const getMyReservationsController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const userId = (req as AuthenticatedRequest).user.userId;
 

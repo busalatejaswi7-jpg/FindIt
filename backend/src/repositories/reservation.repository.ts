@@ -7,9 +7,9 @@ export const createReservationRepository = async (data: {
   quantity: number;
 }) => {
   return await db.transaction(async (tx) => {
-    const inventory = await tx.orm.public.Inventory
-      .where({ id: data.inventoryId })
-      .first();
+    const inventory = await tx.orm.public.Inventory.where({
+      id: data.inventoryId,
+    }).first();
 
     if (!inventory) {
       throw new Error("Inventory not found");
@@ -19,11 +19,12 @@ export const createReservationRepository = async (data: {
       throw new Error("Not enough inventory available");
     }
 
-    const updatedInventory = await tx.orm.public.Inventory
-      .where({ id: data.inventoryId })
-      .where((item) => item.quantity.gte(data.quantity))
+    const updatedInventory = await tx.orm.public.Inventory.where({
+      id: data.inventoryId,
+    })
+      .where((item) => item.quantity.eq(inventory.quantity))
       .update({
-       quantity:inventory.quantity - data.quantity,
+        quantity: inventory.quantity - data.quantity,
         updatedAt: Temporal.Now.instant(),
       });
 
@@ -41,30 +42,29 @@ export const createReservationRepository = async (data: {
     return reservation;
   });
 };
-export const getReservationsByUserRepository = async (
-  userId: string
-) => {
-  const reservations = await db.orm.public.Reservation
-    .where((reservation) => reservation.userId.eq(userId))
-    .all();
+export const getReservationsByUserRepository = async (userId: string) => {
+  const reservations = await db.orm.public.Reservation.where((reservation) =>
+    reservation.userId.eq(userId),
+  ).all();
 
   if (reservations.length === 0) {
     return [];
   }
 
   const inventoryIds = reservations.map(
-    (reservation) => reservation.inventoryId
+    (reservation) => reservation.inventoryId,
   );
 
-  const inventoryItems = await db.orm.public.Inventory
-    .where((item) => item.id.in(inventoryIds))
+  const inventoryItems = await db.orm.public.Inventory.where((item) =>
+    item.id.in(inventoryIds),
+  )
     .include("product")
     .include("shop")
     .all();
 
   return reservations.map((reservation) => {
     const inventory = inventoryItems.find(
-      (item) => item.id === reservation.inventoryId
+      (item) => item.id === reservation.inventoryId,
     );
 
     return {

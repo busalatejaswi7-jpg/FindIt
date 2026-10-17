@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import { loginUser } from "../services/auth.service.js";
 
-export const loginController = async (
-  req: Request,
-  res: Response
-) => {
+export const loginController = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -14,10 +11,7 @@ export const loginController = async (
   }
 
   try {
-    const result = await loginUser(
-      email.trim(),
-      password
-    );
+    const result = await loginUser(email.trim(), password);
 
     return res.json(result);
   } catch (error) {

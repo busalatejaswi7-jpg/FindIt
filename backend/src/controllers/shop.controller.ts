@@ -1,37 +1,36 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { createShop } from "../services/shop.service.js";
-export const createShopController = async (
-  req: Request,
-  res: Response
-) => {
-  const {
-    name,
-    address,
-    city,
-    latitude,
-    longitude,
-    ownerId,
-  } = req.body;
+import type { AuthenticatedRequest } from "../middleware/auth.middleware.js";
+
+export const createShopController = async (req: Request, res: Response) => {
+  const { name, address, city, latitude, longitude } = req.body;
+
+  const ownerId = (req as AuthenticatedRequest).user.userId;
 
   if (
-    !name ||
-    !address ||
-    !city ||
+    typeof name !== "string" ||
+    !name.trim() ||
+    typeof address !== "string" ||
+    !address.trim() ||
+    typeof city !== "string" ||
+    !city.trim() ||
     latitude === undefined ||
     longitude === undefined ||
-    !ownerId
+    !Number.isFinite(Number(latitude)) ||
+    !Number.isFinite(Number(longitude)) ||
+    latitude === "" ||
+    longitude === ""
   ) {
     return res.status(400).json({
-      message:
-        "Name, address, city, latitude, longitude and ownerId are required",
+      message: "Valid name, address, city, latitude and longitude are required",
     });
   }
 
   try {
     const shop = await createShop({
-      name,
-      address,
-      city,
+      name: name.trim(),
+      address: address.trim(),
+      city: city.trim(),
       latitude: Number(latitude),
       longitude: Number(longitude),
       ownerId,

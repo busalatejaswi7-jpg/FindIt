@@ -6,10 +6,10 @@ export const createProductRepository = async (data: {
   category: string;
   image?: string;
 }) => {
- return await db.orm.public.Product.create({
-  name: data.name,
-  description: data.description,
-  category: data.category,
-  image: data.image,
-});
+  return await db.orm.public.Product.create({
+    name: data.name,
+    description: data.description,
+    category: data.category,
+    image: data.image,
+  });
 };
