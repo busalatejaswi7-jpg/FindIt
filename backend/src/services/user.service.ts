@@ -1,5 +1,8 @@
 import bcrypt from "bcryptjs";
-import { createUserRepository, findUserByEmailRepository } from "../repositories/user.repository.js";
+import {
+  createUserRepository,
+  findUserByEmailRepository,
+} from "../repositories/user.repository.js";
 
 export const createUser = async (data: {
   name: string;
@@ -8,11 +11,12 @@ export const createUser = async (data: {
   phone?: string;
   role?: "CUSTOMER" | "SHOP_OWNER";
 }) => {
-  const hashedPassword =await bcrypt.hash(data.password,10);
+  const hashedPassword = await bcrypt.hash(data.password, 10);
   const user = await createUserRepository({
     ...data,
-  password:hashedPassword,});
-const { password, ...safeUser } = user;
+    password: hashedPassword,
+  });
+  const { password, ...safeUser } = user;
 
   return safeUser;
 };

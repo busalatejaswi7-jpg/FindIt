@@ -1,114 +1,116 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createProduct } from "../../../lib/apis";
 
 export default function CreateProductPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
+    setMessage("");
+    setError("");
 
     try {
-      setLoading(true);
-      setMessage("");
-
-      const product = await createProduct({
-        name,
-        description,
-        category,
+      await createProduct({
+        name: name.trim(),
+        description: description.trim() || undefined,
+        category: category.trim(),
       });
 
-      console.log("Created product:", product);
-
-      setMessage("Product created successfully!");
-
+      setMessage("Product created successfully.");
       setName("");
       setDescription("");
       setCategory("");
-    } catch (error) {
-      console.error(error);
-      setMessage("Failed to create product");
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : "Failed to create product",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 px-8 py-10">
-      <div className="mx-auto max-w-xl">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Create Product
-        </h1>
+    <main className="page-section">
+      <div className="page-wrap max-w-3xl">
+        <header className="mb-8 border-b border-[var(--line)] pb-6">
+          <p className="section-kicker">Catalog</p>
+          <h1 className="display-type mt-3 text-4xl leading-tight sm:text-5xl">
+            Create a product
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
+            Add product details to the FINDIT catalog.
+          </p>
+        </header>
 
-        <p className="mt-2 text-gray-500">
-          Add a product to FindIt.
-        </p>
-
-        <form
-          onSubmit={handleSubmit}
-          className="mt-8 space-y-5 rounded-xl bg-white p-6 shadow-sm"
-        >
+        <form onSubmit={handleSubmit} className="surface-panel space-y-5 p-5 sm:p-7">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Product Name
+            <label className="field-label" htmlFor="product-name">
+              Product name
             </label>
-
             <input
+              id="product-name"
               type="text"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              className="mt-2 w-full rounded-lg border px-4 py-2"
+              className="field-control"
               placeholder="Enter product name"
+              autoComplete="off"
+              required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Description
+            <label className="field-label" htmlFor="product-category">
+              Category
             </label>
+            <input
+              id="product-category"
+              type="text"
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              className="field-control"
+              placeholder="Enter category"
+              autoComplete="off"
+              required
+            />
+          </div>
 
+          <div>
+            <label className="field-label" htmlFor="product-description">
+              Description <span className="font-normal text-[var(--muted)]">(optional)</span>
+            </label>
             <textarea
+              id="product-description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              className="mt-2 w-full rounded-lg border px-4 py-2"
-              placeholder="Enter product description"
+              className="field-control min-h-32 resize-y"
+              placeholder="Add a product description"
               rows={4}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Category
-            </label>
+          {error && <p className="notice-error" role="alert">{error}</p>}
+          {message && <p className="notice-success" role="status">{message}</p>}
 
-            <input
-              type="text"
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-              className="mt-2 w-full rounded-lg border px-4 py-2"
-              placeholder="Enter category"
-            />
+          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--line)] pt-5">
+            <button type="submit" disabled={loading} className="button-primary">
+              {loading ? "Creating..." : "Create product"}
+            </button>
+            <Link href="/owner" className="button-secondary">
+              Back to shop workspace
+            </Link>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-black px-4 py-3 font-medium text-white disabled:opacity-50"
-          >
-            {loading ? "Creating..." : "Create Product"}
-          </button>
-
-          {message && (
-            <p className="text-center text-sm text-gray-600">
-              {message}
-            </p>
-          )}
         </form>
       </div>
     </main>

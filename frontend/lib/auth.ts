@@ -9,10 +9,7 @@ export type LoggedInUser = {
 const TOKEN_KEY = "findit_token";
 const USER_KEY = "findit_user";
 
-export const saveAuth = (
-  token: string,
-  user: LoggedInUser
-) => {
+export const saveAuth = (token: string, user: LoggedInUser) => {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 };

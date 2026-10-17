@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import { createProduct } from "../services/product.service.js";
 
-export const createProductController = async (
-  req: Request,
-  res: Response
-) => {
+export const createProductController = async (req: Request, res: Response) => {
   const { name, description, category, image } = req.body;
 
   if (!name || !category) {

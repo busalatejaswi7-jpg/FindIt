@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import { createUser, findUserByEmail } from "../services/user.service.js";
 
-export const createUserController = async (
-  req: Request,
-  res: Response
-) => {
+export const createUserController = async (req: Request, res: Response) => {
   const { name, email, password, phone, role } = req.body;
 
   if (!name || !email || !password) {
@@ -33,7 +30,7 @@ export const createUserController = async (
 };
 export const findUserByEmailController = async (
   req: Request,
-  res: Response
+  res: Response,
 ) => {
   const email = req.query.email;
 

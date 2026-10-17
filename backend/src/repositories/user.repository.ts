@@ -16,5 +16,5 @@ export const createUserRepository = async (data: {
   });
 };
 export const findUserByEmailRepository = async (email: string) => {
-  return await db.orm.public.User.where((user)=>user.email.eq(email)).first();
+  return await db.orm.public.User.where((user) => user.email.eq(email)).first();
 };
